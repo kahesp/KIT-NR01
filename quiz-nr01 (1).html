@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico NR-01 | Sua empresa está adequada?</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D1B2A;
+    --steel: #1B3A5C;
+    --mid: #2E6B9E;
+    --ice: #D6E8F7;
+    --amber: #F0A500;
+    --amber-dark: #C88500;
+    --white: #F7F9FC;
+    --gray: #8FA3B3;
+    --danger: #E05252;
+    --warn: #E08B2E;
+    --ok: #3BAA6E;
+    --line: rgba(214,232,247,0.1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px 48px;
+    overflow-x: hidden;
+  }
+
+  /* BG */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(214,232,247,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(214,232,247,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(46,107,158,0.2) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* WRAPPER */
+  .quiz-wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 640px;
+  }
+
+  /* TOPO */
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 36px;
+    animation: fadeUp .5s ease both;
+  }
+
+  .quiz-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(240,165,0,0.12);
+    border: 1px solid rgba(240,165,0,0.35);
+    border-radius: 4px;
+    padding: 5px 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 20px;
+  }
+
+  .quiz-header h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(28px, 6vw, 44px);
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1.05;
+    margin-bottom: 12px;
+  }
+
+  .quiz-header h1 span { color: var(--amber); }
+
+  .quiz-header p {
+    font-size: 15px;
+    color: var(--ice);
+    opacity: 0.75;
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* PROGRESS */
+  .progress-wrap {
+    margin-bottom: 28px;
+    animation: fadeUp .5s .1s ease both;
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 8px;
+  }
+
+  .progress-bar-bg {
+    height: 4px;
+    background: rgba(214,232,247,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--amber);
+    border-radius: 2px;
+    transition: width .4s ease;
+    width: 0%;
+  }
+
+  /* CARD */
+  .quiz-card {
+    background: rgba(27,58,92,0.45);
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--amber);
+    border-radius: 8px;
+    padding: 36px 32px 32px;
+    animation: fadeUp .4s ease both;
+  }
+
+  .question-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 10px;
+  }
+
+  .question-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(20px, 4vw, 26px);
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1.15;
+    margin-bottom: 28px;
+    letter-spacing: 0.02em;
+  }
+
+  /* OPTIONS */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: rgba(13,27,42,0.6);
+    border: 1px solid rgba(214,232,247,0.12);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s, transform .15s;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: left;
+    color: var(--white);
+    width: 100%;
+  }
+
+  .opt:hover {
+    border-color: rgba(240,165,0,0.5);
+    background: rgba(27,58,92,0.7);
+    transform: translateX(4px);
+  }
+
+  .opt.selected {
+    border-color: var(--amber);
+    background: rgba(240,165,0,0.1);
+  }
+
+  .opt-letter {
+    width: 28px; height: 28px;
+    border: 1px solid rgba(214,232,247,0.25);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray);
+    flex-shrink: 0;
+    transition: background .2s, border-color .2s, color .2s;
+  }
+
+  .opt.selected .opt-letter {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: var(--navy);
+  }
+
+  /* NAV */
+  .quiz-nav {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+  }
+
+  .btn-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--amber);
+    color: var(--navy);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 13px 28px;
+    border: none;
+    cursor: pointer;
+    transition: background .2s, transform .15s, opacity .2s;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .btn-next.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .btn-next.active:hover {
+    background: var(--amber-dark);
+    transform: translateY(-2px);
+  }
+
+  /* ── RESULTADO ── */
+  .result-wrap {
+    display: none;
+    animation: fadeUp .5s ease both;
+  }
+
+  .result-wrap.show { display: block; }
+
+  .result-card {
+    border-radius: 8px;
+    padding: 40px 32px;
+    border: 1px solid var(--line);
+    border-top-width: 3px;
+    margin-bottom: 20px;
+  }
+
+  .result-card.danger { border-top-color: var(--danger); background: rgba(224,82,82,0.08); }
+  .result-card.warn   { border-top-color: var(--warn);   background: rgba(224,139,46,0.08); }
+  .result-card.ok     { border-top-color: var(--ok);     background: rgba(59,170,110,0.08); }
+
+  .result-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin-bottom: 20px;
+  }
+
+  .result-card.danger .result-icon { background: rgba(224,82,82,0.15); }
+  .result-card.warn   .result-icon { background: rgba(224,139,46,0.15); }
+  .result-card.ok     .result-icon { background: rgba(59,170,110,0.15); }
+
+  .result-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .result-card.danger .result-label { color: var(--danger); }
+  .result-card.warn   .result-label { color: var(--warn); }
+  .result-card.ok     .result-label { color: var(--ok); }
+
+  .result-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(26px, 5vw, 36px);
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1.1;
+    margin-bottom: 14px;
+  }
+
+  .result-text {
+    font-size: 15px;
+    color: var(--ice);
+    opacity: 0.8;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  /* SCORE BAR */
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .score-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gray);
+    white-space: nowrap;
+  }
+
+  .score-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: rgba(214,232,247,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+  }
+
+  .result-card.danger .score-bar-fill { background: var(--danger); }
+  .result-card.warn   .score-bar-fill { background: var(--warn); }
+  .result-card.ok     .score-bar-fill { background: var(--ok); }
+
+  .score-pct {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  /* CHECKLIST */
+  .check-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--ice);
+    opacity: 0.85;
+    line-height: 1.5;
+  }
+
+  .check-dot {
+    width: 18px; height: 18px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 11px;
+  }
+
+  .check-dot.x { background: rgba(224,82,82,0.2); color: var(--danger); }
+  .check-dot.w { background: rgba(224,139,46,0.2); color: var(--warn); }
+  .check-dot.v { background: rgba(59,170,110,0.2); color: var(--ok); }
+
+  /* CTA */
+  .btn-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--amber);
+    color: var(--navy);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 18px 36px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .2s, transform .15s;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    width: 100%;
+  }
+
+  .btn-cta:hover {
+    background: var(--amber-dark);
+    transform: translateY(-2px);
+  }
+
+  .btn-restart {
+    display: block;
+    text-align: center;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--gray);
+    cursor: pointer;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    width: 100%;
+  }
+
+  .btn-restart:hover { color: var(--ice); }
+
+  /* TRUST */
+  .trust-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--gray);
+    letter-spacing: 0.06em;
+  }
+
+  .trust-row span { display: flex; align-items: center; gap: 6px; }
+
+  /* HIDDEN */
+  .quiz-main { }
+  .quiz-main.hide { display: none; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 480px) {
+    .quiz-card { padding: 28px 20px 24px; }
+    .result-card { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-wrap">
+
+  <!-- HEADER -->
+  <div class="quiz-header">
+    <div class="quiz-badge">✦ Diagnóstico Gratuito · NR-01</div>
+    <h1>Sua empresa está<br><span>adequada à NR-01?</span></h1>
+    <p>Responda 7 perguntas rápidas e descubra se o seu PGR está em conformidade com a exigência de fatores psicossociais.</p>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-meta">
+      <span id="prog-label">Pergunta 1 de 7</span>
+      <span id="prog-pct">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="prog-fill"></div>
+    </div>
+  </div>
+
+  <!-- QUIZ MAIN -->
+  <div class="quiz-main" id="quiz-main">
+    <div class="quiz-card" id="quiz-card">
+      <div class="question-num" id="q-num">Pergunta 01 / 07</div>
+      <div class="question-text" id="q-text"></div>
+      <div class="options" id="q-opts"></div>
+    </div>
+    <div class="quiz-nav">
+      <button class="btn-next" id="btn-next" onclick="nextQuestion()">
+        Próxima
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="result-wrap" id="result-wrap">
+    <div class="result-card" id="result-card">
+      <div class="result-icon" id="result-icon"></div>
+      <div class="result-label" id="result-label"></div>
+      <div class="result-title" id="result-title"></div>
+      <div class="result-text" id="result-text"></div>
+
+      <div class="score-row">
+        <span class="score-label">Nível de risco</span>
+        <div class="score-bar-bg">
+          <div class="score-bar-fill" id="score-fill" style="width:0%"></div>
+        </div>
+        <span class="score-pct" id="score-pct"></span>
+      </div>
+
+      <div class="check-list" id="check-list"></div>
+
+      <a href="#" class="btn-cta" id="btn-cta">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Ver a solução completa
+      </a>
+      <button class="btn-restart" onclick="restartQuiz()">↺ Refazer o diagnóstico</button>
+    </div>
+
+    <div class="trust-row">
+      <span>🔒 100% gratuito</span>
+      <span>⚡ Resultado imediato</span>
+      <span>📋 Base: Portaria MTE 1.419/2024</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    text: "A empresa já incluiu a avaliação de fatores psicossociais no PGR?",
+    opts: [
+      { label: "Sim, está documentada e atualizada", score: 0 },
+      { label: "Está em processo de inclusão", score: 1 },
+      { label: "Ainda não foi incluída", score: 2 },
+      { label: "Não sei informar", score: 2 }
+    ]
+  },
+  {
+    text: "Existe um cronograma definido para a avaliação psicossocial?",
+    opts: [
+      { label: "Sim, com prazos e responsáveis definidos", score: 0 },
+      { label: "Existe informalmente, sem documento formal", score: 1 },
+      { label: "Não existe cronograma", score: 2 },
+      { label: "Não sei informar", score: 2 }
+    ]
+  },
+  {
+    text: "Há um formulário ou instrumento para entrevistar os trabalhadores sobre fatores psicossociais?",
+    opts: [
+      { label: "Sim, utilizamos um formulário estruturado", score: 0 },
+      { label: "Usamos perguntas informais sem padrão", score: 1 },
+      { label: "Não realizamos entrevistas", score: 2 },
+      { label: "Não sei informar", score: 2 }
+    ]
+  },
+  {
+    text: "A empresa possui uma matriz de risco específica para fatores psicossociais?",
+    opts: [
+      { label: "Sim, com classificação e prioridades", score: 0 },
+      { label: "Está incluída de forma genérica no PGR", score: 1 },
+      { label: "Não possui matriz de risco psicossocial", score: 2 },
+      { label: "Não sei informar", score: 2 }
+    ]
+  },
+  {
+    text: "Existe um plano de ação documentado para tratar os riscos psicossociais identificados?",
+    opts: [
+      { label: "Sim, com responsáveis e prazos definidos", score: 0 },
+      { label: "Existe parcialmente, sem controle formal", score: 1 },
+      { label: "Não existe plano de ação", score: 2 },
+      { label: "Não sei informar", score: 2 }
+    ]
+  },
+  {
+    text: "Foi elaborado um relatório técnico sobre os resultados da avaliação psicossocial?",
+    opts: [
+      { label: "Sim, com análise e conclusões documentadas", score: 0 },
+      { label: "Existe um registro parcial ou informal", score: 1 },
+      { label: "Não foi elaborado nenhum relatório", score: 2 },
+      { label: "Não sei informar", score: 2 }
+    ]
+  },
+  {
+    text: "Os resultados da avaliação foram apresentados formalmente à empresa com ata registrada?",
+    opts: [
+      { label: "Sim, com ata de reunião assinada", score: 0 },
+      { label: "Foi apresentado verbalmente, sem registro formal", score: 1 },
+      { label: "Não houve apresentação formal", score: 2 },
+      { label: "Não sei informar", score: 2 }
+    ]
+  }
+];
+
+let current = 0;
+let answers = [];
+let selectedOpt = null;
+
+const PAGE_URL = "index.html";
+
+function renderQuestion() {
+  const q = questions[current];
+  const letters = ['A','B','C','D'];
+
+  document.getElementById('q-num').textContent = `Pergunta ${String(current+1).padStart(2,'0')} / 07`;
+  document.getElementById('q-text').textContent = q.text;
+
+  const optsEl = document.getElementById('q-opts');
+  optsEl.innerHTML = '';
+
+  q.opts.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span>${o.label}`;
+    btn.onclick = () => selectOpt(i, btn);
+    optsEl.appendChild(btn);
+  });
+
+  updateProgress();
+  selectedOpt = null;
+  document.getElementById('btn-next').classList.remove('active');
+
+  // animate card
+  const card = document.getElementById('quiz-card');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = 'fadeUp .35s ease both';
+}
+
+function selectOpt(i, btn) {
+  document.querySelectorAll('.opt').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedOpt = i;
+  document.getElementById('btn-next').classList.add('active');
+}
+
+function updateProgress() {
+  const pct = Math.round((current / questions.length) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `Pergunta ${current+1} de ${questions.length}`;
+  document.getElementById('prog-pct').textContent = pct + '%';
+}
+
+function nextQuestion() {
+  if (selectedOpt === null) return;
+  answers.push(questions[current].opts[selectedOpt].score);
+
+  if (current < questions.length - 1) {
+    current++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById('prog-fill').style.width = '100%';
+  document.getElementById('prog-pct').textContent = '100%';
+  document.getElementById('quiz-main').classList.add('hide');
+
+  const total = answers.reduce((a, b) => a + b, 0);
+  const max = questions.length * 2;
+  const risk = Math.round((total / max) * 100);
+
+  const wrap = document.getElementById('result-wrap');
+  const card = document.getElementById('result-card');
+  wrap.classList.add('show');
+
+  let level, icon, label, title, text, checks;
+
+  if (risk <= 30) {
+    level = 'ok';
+    icon = '✅';
+    label = 'Situação: Adequada';
+    title = 'Sua empresa está no caminho certo!';
+    text = 'O diagnóstico indica que sua empresa já possui uma boa base de adequação à NR-01 em relação aos fatores psicossociais. Ainda assim, é importante garantir que toda a documentação esteja completa, atualizada e tecnicamente sólida para evitar autuações.';
+    checks = [
+      { t: 'v', msg: 'PGR inclui fatores psicossociais' },
+      { t: 'v', msg: 'Instrumentos de coleta existentes' },
+      { t: 'w', msg: 'Documentação pode precisar de revisão técnica' },
+      { t: 'w', msg: 'Mantenha relatórios e atas atualizados' },
+    ];
+  } else if (risk <= 65) {
+    level = 'warn';
+    icon = '⚠️';
+    label = 'Situação: Atenção necessária';
+    title = 'Sua empresa tem lacunas importantes';
+    text = 'O diagnóstico identificou pontos críticos que colocam sua empresa em risco de não conformidade com a Portaria MTE 1.419/2024. Faltam documentos ou processos formais que são exigidos na avaliação de fatores psicossociais do PGR.';
+    checks = [
+      { t: 'x', msg: 'Documentação incompleta ou informal' },
+      { t: 'x', msg: 'Ausência de instrumentos padronizados' },
+      { t: 'w', msg: 'Risco de autuação em fiscalização' },
+      { t: 'w', msg: 'Necessidade de regularização urgente' },
+    ];
+  } else {
+    level = 'danger';
+    icon = '🚨';
+    label = 'Situação: Risco alto de autuação';
+    title = 'Sua empresa não está adequada à NR-01';
+    text = 'O diagnóstico mostra que sua empresa está significativamente exposta a riscos legais. A avaliação de fatores psicossociais é obrigatória desde a Portaria MTE 1.419/2024, e a ausência de documentação técnica pode resultar em multas e interdições.';
+    checks = [
+      { t: 'x', msg: 'PGR não contempla fatores psicossociais' },
+      { t: 'x', msg: 'Ausência de documentação técnica formal' },
+      { t: 'x', msg: 'Sem plano de ação ou relatório de resultados' },
+      { t: 'x', msg: 'Alto risco de autuação em fiscalização' },
+    ];
+  }
+
+  card.className = `result-card ${level}`;
+  document.getElementById('result-icon').textContent = icon;
+  document.getElementById('result-label').textContent = label;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-text').textContent = text;
+  document.getElementById('score-pct').textContent = risk + '%';
+
+  const cl = document.getElementById('check-list');
+  cl.innerHTML = checks.map(c => `
+    <div class="check-item">
+      <span class="check-dot ${c.t}">${c.t === 'v' ? '✓' : c.t === 'w' ? '!' : '✕'}</span>
+      ${c.msg}
+    </div>
+  `).join('');
+
+  // Update CTA text based on level
+  const ctaTexts = {
+    ok: 'Fortaleça sua documentação agora',
+    warn: 'Regularize sua empresa agora',
+    danger: 'Resolva isso agora — Kit completo'
+  };
+  document.getElementById('btn-cta').innerHTML = `
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    ${ctaTexts[level]}
+  `;
+  document.getElementById('btn-cta').href = PAGE_URL;
+
+  setTimeout(() => {
+    document.getElementById('score-fill').style.width = risk + '%';
+  }, 100);
+}
+
+function restartQuiz() {
+  current = 0;
+  answers = [];
+  selectedOpt = null;
+  document.getElementById('quiz-main').classList.remove('hide');
+  document.getElementById('result-wrap').classList.remove('show');
+  renderQuestion();
+}
+
+// Init
+renderQuestion();
+</script>
+</body>
+</html>
